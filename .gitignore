@@ -1,0 +1,13 @@
+/target/
+/node_modules/
+/.dev.vars
+/.dev.vars.*
+!/.dev.vars.example
+/.wrangler/
+/crates/api/build/
+/artifacts/
+
+# Personal files kept out of the public repo
+/obs/ISHQ_Rank_Tracker.json
+/tasks/
+/rules.md

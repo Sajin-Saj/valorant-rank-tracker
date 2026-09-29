@@ -1,0 +1,33 @@
+name = "valorant-rank-tracker"
+main = "crates/api/build/index.js"
+compatibility_date = "2026-09-01"
+
+[build]
+cwd = "crates/api"
+command = "node ../../scripts/build.mjs"
+watch_dir = ["crates/core/src", "crates/core/tests/fixtures", "crates/core/Cargo.toml", "crates/api/src", "crates/api/Cargo.toml", "Cargo.toml", "Cargo.lock"]
+
+[assets]
+directory = "./public"
+not_found_handling = "404-page"
+html_handling = "auto-trailing-slash"
+run_worker_first = ["/api/*"]
+
+[[durable_objects.bindings]]
+name = "TRACKER"
+class_name = "Tracker"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Tracker"]
+
+[vars]
+# Self-hosting: set these to your own Riot ID. REGION: ap | eu | na | kr | latam | br. PLATFORM: pc | console.
+RIOT_NAME = "ISHQ"
+RIOT_TAG = "tejo2"
+REGION = "ap"
+PLATFORM = "pc"
+REFRESH_SECS = "60"
+WATCH_SECS = "600"
+SESSION_GAP_HOURS = "6"
+MOCK_MODE = "false"

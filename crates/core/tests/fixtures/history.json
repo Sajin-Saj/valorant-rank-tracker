@@ -1,0 +1,1 @@
+{"status":200,"data":{"account":{"puuid":"mock-ishq","name":"ISHQ","tag":"tejo2"},"history":[{"match_id":"mock-1","tier":{"id":19,"name":"Diamond 2"},"map":{"id":"7eaecc1b-4337-bbf6-6ab9-04b8f06b3319","name":"Ascent"},"season":{"short":"e9a3"},"rr":67,"last_change":21,"elo":1667,"refunded_rr":0,"was_derank_protected":false,"date":"2026-09-29T10:00:00Z"}]}}

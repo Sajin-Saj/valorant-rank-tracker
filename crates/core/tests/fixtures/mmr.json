@@ -1,0 +1,1 @@
+{"status":200,"data":{"account":{"puuid":"mock-ishq","name":"ISHQ","tag":"tejo2"},"current":{"tier":{"id":19,"name":"Diamond 2"},"rr":67,"last_change":21,"elo":1667,"leaderboard_placement":null},"peak":{"tier":{"id":20,"name":"Diamond 3"},"season":{"short":"e9a3"}},"seasonal":[{"season":{"short":"e9a2"},"end_tier":{"id":18,"name":"Diamond 1"},"wins":31,"games":58}]}}

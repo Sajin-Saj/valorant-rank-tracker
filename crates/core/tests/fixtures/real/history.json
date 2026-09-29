@@ -1,0 +1,432 @@
+{
+  "status": 200,
+  "data": {
+    "account": {
+      "name": "ISHQ",
+      "tag": "tejo2",
+      "puuid": "6ab96382-5ee6-59a5-8d97-bbe08c98154c"
+    },
+    "history": [
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "d89529a8-1d15-4db3-bf14-f7b6c91980b5",
+        "map": {
+          "id": "2bee0dc9-4ffe-519b-1cbd-7fbe763a6047",
+          "name": "Haven"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 52,
+        "last_change": -20,
+        "elo": 1052,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-28T16:40:56.573Z"
+      },
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "f9d8b348-8b5e-4212-85ae-c84b04d272f4",
+        "map": {
+          "id": "d960549e-485c-e861-8d71-aa9d1aed12a2",
+          "name": "Split"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 72,
+        "last_change": 16,
+        "elo": 1072,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-28T16:01:40.009Z"
+      },
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "b279c106-19a7-4ece-97cb-9fac503934c4",
+        "map": {
+          "id": "2fe4ed3a-450a-948b-6d6b-e89a78e680a9",
+          "name": "Lotus"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 56,
+        "last_change": -29,
+        "elo": 1056,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-27T18:20:21.75Z"
+      },
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "7a6d3f7d-5349-4561-ac3b-78ca66891926",
+        "map": {
+          "id": "756da597-416b-c0f2-f47b-afbdf28670bc",
+          "name": "Summit"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 85,
+        "last_change": 14,
+        "elo": 1085,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-27T17:37:40.224Z"
+      },
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "f3c771fd-82d3-43c6-9a25-8fd71310bb9b",
+        "map": {
+          "id": "7eaecc1b-4337-bbf6-6ab9-04b8f06b3319",
+          "name": "Ascent"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 71,
+        "last_change": -28,
+        "elo": 1071,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-27T16:54:44.486Z"
+      },
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "76583078-0a09-4f14-8714-e875d33ca6fb",
+        "map": {
+          "id": "2fe4ed3a-450a-948b-6d6b-e89a78e680a9",
+          "name": "Lotus"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 99,
+        "last_change": 16,
+        "elo": 1099,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-27T08:50:16.506Z"
+      },
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "8fa5bb21-b4a0-46a5-8be1-22478d6fb567",
+        "map": {
+          "id": "224b0a95-48b9-f703-1bd8-67aca101a61f",
+          "name": "Abyss"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 83,
+        "last_change": 21,
+        "elo": 1083,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-27T08:18:27.535Z"
+      },
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "bfdbabbe-a10e-44a8-8b98-3a52f5ec418e",
+        "map": {
+          "id": "d960549e-485c-e861-8d71-aa9d1aed12a2",
+          "name": "Split"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 62,
+        "last_change": 21,
+        "elo": 1062,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-27T07:21:12.096Z"
+      },
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "cabd088b-4a7a-412b-b776-01545232227f",
+        "map": {
+          "id": "2fe4ed3a-450a-948b-6d6b-e89a78e680a9",
+          "name": "Lotus"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 41,
+        "last_change": 10,
+        "elo": 1041,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-26T20:05:33.844Z"
+      },
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "cce6031d-3ecb-492a-b827-4bad17ceb0b1",
+        "map": {
+          "id": "92584fbe-486a-b1b2-9faa-39b0f486b498",
+          "name": "Sunset"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 31,
+        "last_change": 17,
+        "elo": 1031,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-26T19:33:45.48Z"
+      },
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "9d3c9b5e-c68c-46db-aa83-43330245525f",
+        "map": {
+          "id": "2bee0dc9-4ffe-519b-1cbd-7fbe763a6047",
+          "name": "Haven"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 14,
+        "last_change": 14,
+        "elo": 1014,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-26T19:04:16.377Z"
+      },
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "056d5f72-b2bf-4772-a649-25b1005acb6d",
+        "map": {
+          "id": "756da597-416b-c0f2-f47b-afbdf28670bc",
+          "name": "Summit"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 0,
+        "last_change": -26,
+        "elo": 1000,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-26T17:33:14.166Z"
+      },
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "65c0a43a-271b-41f5-823b-d41b684baaac",
+        "map": {
+          "id": "224b0a95-48b9-f703-1bd8-67aca101a61f",
+          "name": "Abyss"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 26,
+        "last_change": 13,
+        "elo": 1026,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-26T15:59:06.729Z"
+      },
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "f5e855ea-3a41-450c-b64f-4bd95f8b7f23",
+        "map": {
+          "id": "92584fbe-486a-b1b2-9faa-39b0f486b498",
+          "name": "Sunset"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 13,
+        "last_change": 13,
+        "elo": 1013,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-26T15:24:10.771Z"
+      },
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "b463ea96-8eb3-4d8c-be3b-5d0ad9a0bb12",
+        "map": {
+          "id": "2bee0dc9-4ffe-519b-1cbd-7fbe763a6047",
+          "name": "Haven"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 0,
+        "last_change": -19,
+        "elo": 1000,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-26T14:34:55.661Z"
+      },
+      {
+        "tier": {
+          "id": 13,
+          "name": "Gold 2"
+        },
+        "match_id": "c5a529a2-087f-4a32-835e-cfcc82c66159",
+        "map": {
+          "id": "7eaecc1b-4337-bbf6-6ab9-04b8f06b3319",
+          "name": "Ascent"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 10,
+        "last_change": 17,
+        "elo": 1010,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-23T18:24:01.656Z"
+      },
+      {
+        "tier": {
+          "id": 12,
+          "name": "Gold 1"
+        },
+        "match_id": "5d933a86-1045-4818-9ec9-e4be0ed76c4f",
+        "map": {
+          "id": "92584fbe-486a-b1b2-9faa-39b0f486b498",
+          "name": "Sunset"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 85,
+        "last_change": 10,
+        "elo": 985,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-23T17:26:15.582Z"
+      },
+      {
+        "tier": {
+          "id": 12,
+          "name": "Gold 1"
+        },
+        "match_id": "e3bfd771-dc0f-4e65-a062-568a4a38cb6a",
+        "map": {
+          "id": "2bee0dc9-4ffe-519b-1cbd-7fbe763a6047",
+          "name": "Haven"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 75,
+        "last_change": -18,
+        "elo": 975,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-23T16:50:45.493Z"
+      },
+      {
+        "tier": {
+          "id": 12,
+          "name": "Gold 1"
+        },
+        "match_id": "e89946fc-8aff-4ec7-ad53-09a7ae74e5a1",
+        "map": {
+          "id": "224b0a95-48b9-f703-1bd8-67aca101a61f",
+          "name": "Abyss"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 93,
+        "last_change": 20,
+        "elo": 993,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-21T06:11:06.018Z"
+      },
+      {
+        "tier": {
+          "id": 12,
+          "name": "Gold 1"
+        },
+        "match_id": "21850bf2-5218-42b5-a933-92487913ff68",
+        "map": {
+          "id": "7eaecc1b-4337-bbf6-6ab9-04b8f06b3319",
+          "name": "Ascent"
+        },
+        "season": {
+          "id": "8102cd81-43a0-d0d7-bd59-47b8fe9bed1b",
+          "short": "e11a5"
+        },
+        "rr": 73,
+        "last_change": -27,
+        "elo": 973,
+        "refunded_rr": 0,
+        "was_derank_protected": false,
+        "date": "2026-09-21T05:11:18.325Z"
+      }
+    ]
+  }
+}

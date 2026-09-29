@@ -1,0 +1,4 @@
+# Copy to .dev.vars; never put real secrets in this example.
+MOCK_MODE=true
+ADMIN_TOKEN=replace-with-a-long-random-token
+HENRIK_API_KEY=
