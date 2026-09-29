@@ -270,3 +270,150 @@ fn peak_never_regresses_when_upstream_lags() {
     let down = apply(&up, next, NOW + 1000);
     assert_eq!(down.peak.unwrap().tier_id, 20);
 }
+
+#[test]
+fn real_match_performance() {
+    let mmr = serde_json::from_str::<Envelope<Mmr>>(include_str!("fixtures/real/mmr.json"))
+        .unwrap()
+        .data;
+    let m = serde_json::from_str::<Envelope<Match>>(include_str!("fixtures/real/match.json"))
+        .unwrap()
+        .data;
+    // Independently computed from the fixture: 24 rounds, 6496 score, 4236 damage, 20/45/3 shots.
+    let p = normalize::perf(&m, &mmr.account.puuid).unwrap();
+    assert_eq!((p.acs, p.adr, p.hs_pct, p.first_bloods), (271, 177, 29, 1));
+    assert_eq!(p.mvp, Some(Mvp::Team)); // top of own team, not of the lobby
+    assert!(normalize::perf(&m, "absent").is_none());
+}
+#[test]
+fn perf_mvp_and_empty_matches() {
+    let mut m = serde_json::from_str::<Envelope<Match>>(include_str!("fixtures/match.json"))
+        .unwrap()
+        .data;
+    // A lone player is never MVP; zero shots give 0% HS instead of dividing by zero.
+    let p = normalize::perf(&m, "mock-ishq").unwrap();
+    assert_eq!((p.acs, p.hs_pct, p.mvp), (245, 0, None));
+    let mut rival = m.players[0].clone();
+    rival.puuid = "rival".into();
+    rival.team_id = "Blue".into();
+    rival.stats.score = 100;
+    m.players.push(rival);
+    assert_eq!(
+        normalize::perf(&m, "mock-ishq").unwrap().mvp,
+        Some(Mvp::Match)
+    );
+    m.teams[0].rounds = Rounds { won: 0, lost: 0 };
+    assert!(normalize::perf(&m, "mock-ishq").is_none());
+}
+#[test]
+fn streak_milestones_fire_once_and_draw_breaks() {
+    let mut s = baseline(); // one win
+    for i in 1..=4 {
+        let at = NOW + i * 1000;
+        s = apply(
+            &s,
+            input(
+                rank(18, 1590 + i as i32 * 20),
+                vec![game(
+                    &format!("w{i}"),
+                    1590 + i as i32 * 20,
+                    20,
+                    Outcome::Win,
+                    at,
+                )],
+            ),
+            at,
+        );
+    }
+    assert_eq!(
+        s.streak,
+        Some(Streak {
+            result: Outcome::Win,
+            count: 5
+        })
+    );
+    let streaks: Vec<_> = s
+        .events
+        .iter()
+        .filter(|e| e.kind == EventKind::WinStreak)
+        .map(|e| e.streak)
+        .collect();
+    assert_eq!(streaks, vec![Some(3), Some(5)]);
+    let again = apply(
+        &s,
+        input(s.rank.clone(), vec![s.history[0].clone()]),
+        NOW + 5000,
+    );
+    assert_eq!(
+        again.events, s.events,
+        "replayed games add no streak events"
+    );
+    let s = apply(
+        &s,
+        input(
+            s.rank.clone(),
+            vec![game("d", 1670, 0, Outcome::Draw, NOW + 6000)],
+        ),
+        NOW + 6000,
+    );
+    assert_eq!(s.streak, None);
+    let mut s = s;
+    for i in 0..3 {
+        let at = NOW + 7000 + i * 1000;
+        s = apply(
+            &s,
+            input(
+                s.rank.clone(),
+                vec![game(&format!("l{i}"), 1650, -20, Outcome::Loss, at)],
+            ),
+            at,
+        );
+    }
+    assert_eq!(s.streak.as_ref().map(|x| x.count), Some(3));
+    assert_eq!(
+        s.events.last().map(|e| (&e.kind, e.streak)),
+        Some((&EventKind::LossStreak, Some(3)))
+    );
+}
+#[test]
+fn chat_replies() {
+    use tracker_core::text::{reply, KINDS};
+    let empty = TrackerState::default();
+    assert_eq!(reply(&empty, "lastgame").unwrap(), "No games tracked yet");
+    assert_eq!(reply(&empty, "stats").unwrap(), "No match stats yet");
+    assert!(reply(&empty, "nope").is_none());
+    let mut s = baseline();
+    let m = &mut s.history[0];
+    (m.map, m.agent, m.score, m.kda) = ("Ascent".into(), "Jett".into(), "13-9".into(), [21, 14, 6]);
+    m.perf = Some(Perf {
+        acs: 271,
+        adr: 177,
+        hs_pct: 29,
+        first_bloods: 1,
+        mvp: Some(Mvp::Team),
+    });
+    s.rank.tier_name = "Gold 2".into();
+    s.rank.rr = 52;
+    s.rank.last_change = -20;
+    assert_eq!(reply(&s, "rank").unwrap(), "Gold 2 · 52 RR · -20 last game");
+    assert_eq!(
+        reply(&s, "lastgame").unwrap(),
+        "Last game: Win 13-9 on Ascent as Jett · 21/14/6 · 271 ACS · 29% HS · +20 RR · Team MVP"
+    );
+    assert_eq!(
+        reply(&s, "winrate").unwrap(),
+        "Last 1: 1W 0L 0D · 100% win rate"
+    );
+    assert_eq!(
+        reply(&s, "stats").unwrap(),
+        "Last 1 avg: 271 ACS · 177 ADR · 29% HS · 1.50 K/D"
+    );
+    assert_eq!(reply(&s, "streak").unwrap(), "No active streak");
+    for kind in KINDS {
+        let text = reply(&s, kind).unwrap();
+        assert!(
+            !text.is_empty() && text.len() < 400 && !text.contains('\n'),
+            "{kind}"
+        );
+    }
+}

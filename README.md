@@ -5,10 +5,11 @@ The backend is Rust compiled to WebAssembly on **Cloudflare Workers** with one S
 
 ![Rank card overlay](docs/rank-card.png)
 
-- **Four transparent overlays:** rank card, recent games, session (net RR, W/L/D, Elo chart) and full-screen alerts (rank up, derank, new peak, match result).
+- **Four transparent overlays:** rank card, recent games with per-match ACS and MVP badges, session (net RR, W/L/D, Elo chart) and full-screen alerts (rank up, derank, new peak, match result, win/loss streaks).
+- **Per-match stats** from the v4 match data: ACS, ADR, headshot %, first bloods, and Match/Team MVP.
 - **A dashboard** with live previews, an OBS URL builder, and admin controls (force refresh, session reset, test alerts).
 - **Background refresh** once a minute while OBS is open. It stops by itself when nobody is watching, so no API calls are wasted.
-- **A `!rank` chat command** for Nightbot or StreamElements via `/api/rank.txt`.
+- **Seven chat commands** for Nightbot or StreamElements (`!rank`, `!session`, `!lastgame`, `!peak`, `!winrate`, `!streak`, `!stats`), copyable from the dashboard.
 
 Data comes from the unofficial [HenrikDev Valorant API](https://docs.henrikdev.xyz/) (v3 MMR, v2 MMR history, v4 match details). Tier icons, map and agent images come from [valorant-api.com](https://valorant-api.com/).
 
@@ -122,13 +123,15 @@ State polls read cached data and extend a ten-minute watch window. A Durable Obj
 
 The first history import takes at most three games per alarm, oldest first; twenty past games take about six more alarm cycles. Games imported while catching up never trigger alerts. The current rank shows immediately; session counts settle when the import finishes (`meta.catching_up=false`). Sessions split after a gap longer than `SESSION_GAP_HOURS` (default 6). Net RR is current Elo minus starting Elo, so it stays correct across promotions and deranks. Manual reset starts a new session from the current Elo without deleting match history.
 
+Streak alerts fire at 3, 5, 7 and 10 consecutive wins or losses; a draw ends a streak. Games imported before per-match stats existed get their stats filled in the background, one per quiet refresh, for the 10 most recent games.
+
 Upstream failures keep the last state and back off for 60/120/300 seconds; a `Retry-After` header can extend that. Admin force refresh skips the freshness check but respects backoff and concurrent refreshes. A flood of public requests can't speed up upstream refreshes. Alarm handlers absorb upstream failures, so Cloudflare's automatic alarm retries don't bypass the backoff.
 
 ## API and bot commands
 
-Public: `GET /api/state`, `GET /api/health`, `GET /api/rank.txt`.
+Public: `GET /api/state`, `GET /api/health`, `GET /api/rank.txt`, `GET /api/text/{rank|session|lastgame|peak|winrate|streak|stats}`.
 
-Admin (with `Authorization: Bearer <ADMIN_TOKEN>`): `POST /api/admin/refresh`, `POST /api/admin/session/reset`, `POST /api/admin/test/{win|loss|draw|rank_up|derank|new_peak}`.
+Admin (with `Authorization: Bearer <ADMIN_TOKEN>`): `POST /api/admin/refresh`, `POST /api/admin/session/reset`, `POST /api/admin/test/{win|loss|draw|rank_up|derank|new_peak|win_streak|loss_streak}`.
 Test endpoints add preview events without changing rank or session. If no admin token is configured, admin routes reject every request. API responses use `Cache-Control: no-store`.
 
 Nightbot custom command `!rank`:
@@ -143,7 +146,17 @@ StreamElements custom command:
 ${urlfetch https://YOUR-WORKER.workers.dev/api/rank.txt}
 ```
 
-A reply looks like `Gold 2 · 52 RR · -20 last game`.
+A reply looks like `Gold 2 · 52 RR · -20 last game`. The dashboard's **Chat commands** section lists every command with a live preview and a copy button for either bot. Examples:
+
+| Command | Reply |
+|---|---|
+| `!lastgame` | `Last game: Loss 11-13 on Ascent as Jett · 23/20/5 · 271 ACS · 29% HS · -20 RR · Team MVP` |
+| `!session` | `Session: +16 RR · 4W 3L 0D` |
+| `!winrate` | `Last 20: 11W 8L 1D · 55% win rate` |
+| `!streak` | `On a 3-game win streak 🔥` |
+| `!stats` | `Last 10 avg: 245 ACS · 150 ADR · 24% HS · 1.12 K/D` |
+
+Chat routes refresh inline when the data is older than a minute.
 
 ## Free plan usage
 

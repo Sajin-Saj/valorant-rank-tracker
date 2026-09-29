@@ -93,5 +93,58 @@ pub fn match_entry(
         } else {
             m.metadata.started_at.clone()
         },
+        perf: perf(m, puuid),
+    })
+}
+
+fn per(total: u32, rounds: u32) -> u32 {
+    (total as f64 / rounds as f64).round() as u32
+}
+
+/// ACS, ADR, HS%, first bloods and MVP for `puuid`; `None` when the match has no rounds.
+pub fn perf(m: &henrik::Match, puuid: &str) -> Option<Perf> {
+    let p = m.players.iter().find(|p| p.puuid == puuid)?;
+    let own = m
+        .teams
+        .iter()
+        .find(|t| t.team_id.eq_ignore_ascii_case(&p.team_id))?;
+    let rounds = own.rounds.won + own.rounds.lost;
+    if rounds == 0 {
+        return None;
+    }
+    let s = &p.stats;
+    let shots = s.headshots + s.bodyshots + s.legshots;
+    let mut first_kills: std::collections::BTreeMap<u32, &henrik::Kill> = Default::default();
+    for k in &m.kills {
+        let slot = first_kills.entry(k.round).or_insert(k);
+        if k.time_in_round_in_ms < slot.time_in_round_in_ms {
+            *slot = k;
+        }
+    }
+    let top = |team: Option<&str>| {
+        m.players
+            .iter()
+            .filter(|o| team.is_none_or(|t| o.team_id.eq_ignore_ascii_case(t)))
+            .all(|o| o.puuid == puuid || o.stats.score <= s.score)
+    };
+    Some(Perf {
+        acs: per(s.score, rounds),
+        adr: per(s.damage.dealt, rounds),
+        hs_pct: if shots == 0 {
+            0
+        } else {
+            (s.headshots as f64 * 100.0 / shots as f64).round() as u32
+        },
+        first_bloods: first_kills
+            .values()
+            .filter(|k| k.killer.puuid == puuid)
+            .count() as u32,
+        mvp: if m.players.len() > 1 && top(None) {
+            Some(Mvp::Match)
+        } else if m.players.len() > 1 && top(Some(&p.team_id)) {
+            Some(Mvp::Team)
+        } else {
+            None
+        },
     })
 }

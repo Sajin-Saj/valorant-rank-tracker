@@ -73,6 +73,31 @@ pub struct MatchEntry {
     pub derank_protected: bool,
     pub refunded_rr: i32,
     pub at: String,
+    pub perf: Option<Perf>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Mvp {
+    Match,
+    Team,
+}
+
+/// Per-game performance derived from the v4 match; `None` for games stored before stats existed.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct Perf {
+    pub acs: u32,
+    pub adr: u32,
+    pub hs_pct: u32,
+    pub first_bloods: u32,
+    pub mvp: Option<Mvp>,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Streak {
+    pub result: Outcome,
+    pub count: u32,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -94,6 +119,8 @@ pub enum EventKind {
     Derank,
     NewPeak,
     SessionStart,
+    WinStreak,
+    LossStreak,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -112,6 +139,8 @@ pub struct Event {
     pub rr_change: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub match_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub streak: Option<u32>,
     pub icon: String,
     pub accent: String,
 }
@@ -134,6 +163,7 @@ pub struct TrackerState {
     pub acts: Vec<ActView>,
     pub history: Vec<MatchEntry>,
     pub session: Option<Session>,
+    pub streak: Option<Streak>,
     pub events: Vec<Event>,
     pub next_event_id: u64,
     pub meta: Meta,
@@ -146,6 +176,7 @@ impl Default for TrackerState {
             acts: vec![],
             history: vec![],
             session: None,
+            streak: None,
             events: vec![],
             next_event_id: 1,
             meta: Meta::default(),

@@ -51,6 +51,21 @@ pub fn pending_matches<'a>(
     pending
 }
 
+/// Consecutive wins or losses from the newest game; a draw ends any streak.
+pub fn streak(history: &[MatchEntry]) -> Option<Streak> {
+    let first = history.first()?.result.clone();
+    if first == Outcome::Draw {
+        return None;
+    }
+    let count = history.iter().take_while(|m| m.result == first).count() as u32;
+    (count >= 2).then_some(Streak {
+        result: first,
+        count,
+    })
+}
+/// Streak lengths that fire an alert.
+pub const STREAK_MILESTONES: [u32; 4] = [3, 5, 7, 10];
+
 pub fn push_event(state: &mut TrackerState, mut event: Event) {
     event.id = state.next_event_id;
     state.next_event_id += 1;
@@ -70,6 +85,7 @@ pub fn event(kind: EventKind, at: &str, quiet: bool, rank: &RankView) -> Event {
         result: None,
         rr_change: None,
         match_id: None,
+        streak: None,
         icon: rank.icon.clone(),
         accent: rank.accent.clone(),
     }
@@ -142,9 +158,23 @@ pub fn apply_refresh(
         e.match_id = Some(m.match_id.clone());
         push_event(&mut state, e);
         last_at = Some(game_at);
+        let at = m.at.clone();
         state.history.insert(0, m);
+        if let Some(s) = streak(&state.history) {
+            if STREAK_MILESTONES.contains(&s.count) {
+                let kind = if s.result == Outcome::Win {
+                    EventKind::WinStreak
+                } else {
+                    EventKind::LossStreak
+                };
+                let mut e = event(kind, &at, quiet, &input.rank);
+                e.streak = Some(s.count);
+                push_event(&mut state, e);
+            }
+        }
     }
     state.history.truncate(50);
+    state.streak = streak(&state.history);
     if let Some(session) = state.session.as_mut() {
         session.net_rr = input.rank.elo - session.start_elo;
     }
@@ -192,6 +222,7 @@ pub fn apply_refresh(
         || state.acts != prev.acts
         || state.history != prev.history
         || state.session != prev.session
+        || state.streak != prev.streak
         || state.events != prev.events
     {
         state.meta.changed_at = at.clone();

@@ -30,6 +30,9 @@ try{
   assert.ok(health.next_alarm>Date.now());assert.ok(health.watch_until>Date.now());
   const unauthorized=await fetch(`${base}/api/admin/refresh`,{method:'POST'});assert.equal(unauthorized.status,401);
   const rank=await fetch(`${base}/api/rank.txt`);assert.equal(rank.headers.get('cache-control'),'no-store');assert.match(await rank.text(),/RR/);
+  for(const kind of ['rank','session','lastgame','peak','winrate','streak','stats']){const r=await fetch(`${base}/api/text/${kind}`);assert.equal(r.status,200,kind);assert.equal(r.headers.get('cache-control'),'no-store');const t=await r.text();assert.ok(t&&t.length<400&&!t.includes('\n'),kind);}
+  assert.match(await (await fetch(`${base}/api/text/lastgame`)).text(),/ACS · \d+% HS/,'mock games carry per-match stats');
+  assert.equal((await fetch(`${base}/api/text/nope`)).status,404);
   const redirect=await fetch(`${base}/overlay/rank-card.html?scale=1.25`,{redirect:'manual'});assert.equal(redirect.status,307);assert.match(redirect.headers.get('location'),/scale=1.25/);
   for(const path of ['/overlay/rank-card','/overlay/history','/overlay/session','/overlay/alerts','/dashboard/','/fonts/anton.woff2','/fonts/rajdhani.woff2'])assert.equal((await fetch(`${base}${path}`)).status,200,path);
   const checked=state.meta.checked_at;await delay(6100);state=await get('/api/state');assert.notEqual(state.meta.checked_at,checked);console.log('Alarm refreshed state automatically');
@@ -37,18 +40,19 @@ try{
   browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:1440,height:1150}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(`${base}/dashboard/`);await page.locator('#rank').filter({hasText:'Diamond'}).waitFor();
   await page.locator('#admin-token').fill(token);await page.locator('#token-form button[type=submit]').click();
+  await page.locator('#command-list .command').nth(6).waitFor();assert.match(await page.locator('#command-list').innerText(),/\$\(urlfetch http[^)]*\/api\/text\/lastgame\)/);
   await page.locator('#url-form [name=accent]').fill('#FF4655');await page.locator('#url-form [name=scale]').fill('1.25');assert.match(await page.locator('#source-url').inputValue(),/accent=%23FF4655/);assert.match(await page.locator('#source-size').innerText(),/650 × 200/);
   await mkdir(new URL('../artifacts',import.meta.url),{recursive:true});await page.screenshot({path:fileURLToPath(new URL('../artifacts/dashboard.png',import.meta.url)),fullPage:true});
   let alertState=await get('/api/state');
   const overlay=await browser.newPage({viewport:{width:1920,height:1080}});
   await overlay.route('**/api/state',route=>route.fulfill({json:alertState}));
   await overlay.goto(`${base}/overlay/alerts?poll=5`);await delay(700);
-  for(const kind of ['win','loss','draw','rank_up','derank','new_peak']){
+  for(const kind of ['win','loss','draw','rank_up','derank','new_peak','win_streak','loss_streak']){
     alertState=await admin(`test/${kind}`);
     // This page previews one injected event at a time; background mock games
     // are independently covered by the alarm test above.
     alertState.events=[alertState.events.at(-1)];
-    const titles={win:'VICTORY',loss:'DEFEAT',draw:'DRAW',rank_up:'RANK UP',derank:'RANK ADJUSTED',new_peak:'NEW PEAK'};
+    const titles={win:'VICTORY',loss:'DEFEAT',draw:'DRAW',rank_up:'RANK UP',derank:'RANK ADJUSTED',new_peak:'NEW PEAK',win_streak:'3 WIN STREAK',loss_streak:'3 LOSS STREAK'};
     await overlay.locator('.alert-title').filter({hasText:titles[kind]}).waitFor({timeout:15000});
     await overlay.locator('.alert-stage').waitFor({state:'detached',timeout:25000});
   }
@@ -60,7 +64,7 @@ try{
   edgeState.rank.tier_id=0;edgeState.rank.tier_name='Unranked';
   await page.reload();await page.locator('.rank-top h1').filter({hasText:'Unranked'}).waitFor();assert.equal(await page.locator('.rr-section').isVisible(),false);
   await page.unroute('**/api/state');
-  await page.goto(`${base}/overlay/history?count=10`);await page.locator('.match-chip').first().waitFor();assert.ok(await page.locator('.match-chip').count()<=10);
+  await page.goto(`${base}/overlay/history?count=10`);await page.locator('.match-chip').first().waitFor();assert.ok(await page.locator('.match-chip').count()<=10);assert.ok(await page.locator('.match-chip .chip-acs').count()>0,'history chips show ACS');assert.ok(await page.locator('.match-chip .chip-acs').count()>0,'history chips show ACS');
   await page.goto(`${base}/overlay/history?view=acts`);await page.locator('.act-chip').first().waitFor();
   await page.goto(`${base}/overlay/session`);await page.locator('svg.chart .line').waitFor();assert.equal(errors.length,0,errors.join('; '));
   console.log('Browser overlays, acts, session chart, alert queue, dashboard, URL builder verified');

@@ -46,3 +46,18 @@ for(const button of document.querySelectorAll('[data-action]'))button.addEventLi
   try{const r=await fetch(`/api/admin/${button.dataset.action}`,{method:'POST',headers:{Authorization:`Bearer ${token}`}});const data=await r.json();if(!r.ok)throw new Error(data.error||(data.backoff?.until>Date.now()?'Upstream is backing off; retry after the countdown.':`Request failed (${r.status})`));if(data.rank)feed.ingest(data);else if(data.state)feed.ingest(data.state);$('action-status').textContent=button.dataset.action.startsWith('test/')?'Preview event queued. Watch the alerts preview.':button.dataset.action==='session/reset'?'Session reset to the current Elo.':'Tracker refreshed.';await health();}
   catch(e){$('action-status').textContent=e.message||'Unable to reach tracker.';}finally{button.disabled=false;}
 });
+const commands={rank:'Rank, RR and last change',session:'Net RR and W/L/D this session',lastgame:'Result, K/D/A, ACS, HS% and MVP',peak:'Peak rank',winrate:'Record over the last 20 games',streak:'Current win or loss streak',stats:'Average ACS, ADR, HS% and K/D'};
+async function renderCommands(){
+  const bot=$('bot').value;const list=$('command-list');
+  const rows=await Promise.all(Object.entries(commands).map(async([kind,label])=>{
+    const url=new URL(`/api/text/${kind}`,location.origin).href;const line=bot==='nightbot'?`$(urlfetch ${url})`:`\${urlfetch ${url}}`;
+    let reply='';try{const r=await fetch(url,{cache:'no-store'});if(r.ok)reply=await r.text();}catch{}
+    const row=document.createElement('div');row.className='command';
+    row.innerHTML='<code></code><div class="reply"><span></span><small></small></div><button type="button" class="secondary">Copy</button>';
+    row.querySelector('code').textContent=`!${kind}`;row.querySelector('span').textContent=reply||label;row.querySelector('small').textContent=line;
+    row.querySelector('button').addEventListener('click',async e=>{try{await navigator.clipboard.writeText(line);e.target.textContent='Copied';}catch{e.target.textContent='Select & copy';}setTimeout(()=>e.target.textContent='Copy',1800);});
+    return row;
+  }));
+  list.replaceChildren(...rows);
+}
+$('bot').addEventListener('change',renderCommands);renderCommands();

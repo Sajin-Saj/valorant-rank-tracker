@@ -8,7 +8,7 @@ use crate::{
 use std::{cell::RefCell, time::Duration};
 use tracker_core::{
     model::*,
-    normalize,
+    normalize, text,
     tracker::{self, RefreshInput},
 };
 use worker::*;
@@ -193,6 +193,15 @@ impl Tracker {
             next.meta.checked_at = tracker::timestamp(time);
             next.meta.stale = false;
             next.meta.catching_up = false;
+            // Games imported before per-match stats existed: fill one per refresh, newest first.
+            if let Some(i) = next.history.iter().take(10).position(|m| m.perf.is_none()) {
+                if let Ok(game) = upstream::game(cfg, &next.history[i].match_id).await {
+                    if let Some(perf) = normalize::perf(&game, &puuid) {
+                        next.history[i].perf = Some(perf);
+                        next.meta.changed_at = tracker::timestamp(time);
+                    }
+                }
+            }
             return Ok(next);
         }
         let mut entries = vec![];
@@ -296,7 +305,12 @@ impl Tracker {
                     &serde_json::json!({"version":env!("CARGO_PKG_VERSION"),"account":format!("{}#{}",cfg.name,cfg.tag),"region":cfg.region,"platform":cfg.platform,"mode":if cfg.mock {"mock"}else{"live"},"configured":cfg.mock || !cfg.key.is_empty(),"admin_configured":!cfg.admin.is_empty(),"checked_at":state.as_ref().map(|s|&s.meta.checked_at),"stale":state.as_ref().is_none_or(|s|s.meta.stale),"next_alarm":alarm,"watch_until":mem.watch_until,"backoff":mem.backoff,"refreshing":mem.refreshing,"refresh_secs":cfg.refresh_secs,"watch_secs":cfg.watch_secs}),
                 )
             }
-            (Method::Get, "/api/state" | "/api/rank.txt") => {
+            (Method::Get, _)
+                if path == "/api/state"
+                    || path == "/api/rank.txt"
+                    || path.starts_with("/api/text/") =>
+            {
+                let chat = path != "/api/state";
                 self.watch(&cfg, time).await?;
                 let missing = self.mem.borrow().state.is_none();
                 let old = self
@@ -306,19 +320,30 @@ impl Tracker {
                     .as_ref()
                     .and_then(|s| tracker::epoch(&s.meta.checked_at))
                     .is_none_or(|t| time - t >= cfg.refresh_secs as i64 * 1000);
-                if missing || (path == "/api/rank.txt" && old) {
+                if missing || (chat && old) {
                     self.refresh(&cfg, time).await?;
                 }
                 self.schedule(&cfg, now()).await?;
                 let Some(state) = self.view(&cfg, now()) else {
                     return Ok(json(&serde_json::json!({"error":"No data yet. Configure HENRIK_API_KEY or enable MOCK_MODE; check health for retry status."}))?.with_status(503));
                 };
-                if path == "/api/rank.txt" {
-                    let mut response = Response::ok(format!(
-                        "{} · {} RR · {:+} last game",
-                        state.rank.tier_name, state.rank.rr, state.rank.last_change
-                    ))?;
+                if chat {
+                    let kind = path
+                        .strip_prefix("/api/text/")
+                        .unwrap_or("rank")
+                        .trim_end_matches(".txt");
+                    let (body, status) = match text::reply(&state, kind) {
+                        Some(reply) => (reply, 200),
+                        None => (
+                            format!("Unknown command. Try: {}", text::KINDS.join(", ")),
+                            404,
+                        ),
+                    };
+                    let mut response = Response::ok(body)?.with_status(status);
                     response.headers_mut().set("Cache-Control", "no-store")?;
+                    response
+                        .headers_mut()
+                        .set("Content-Type", "text/plain; charset=utf-8")?;
                     return Ok(response);
                 }
                 json(&state)
@@ -371,6 +396,8 @@ impl Tracker {
                     "rank_up" => (EventKind::RankUp, None, None),
                     "derank" => (EventKind::Derank, None, None),
                     "new_peak" => (EventKind::NewPeak, None, None),
+                    "win_streak" => (EventKind::WinStreak, None, None),
+                    "loss_streak" => (EventKind::LossStreak, None, None),
                     _ => {
                         return Ok(json(&serde_json::json!({"error":"Unknown test event"}))?
                             .with_status(404))
@@ -381,6 +408,9 @@ impl Tracker {
                 e.rr_change = change;
                 e.from = Some("Diamond 1".into());
                 e.to = Some(state.rank.tier_name.clone());
+                if matches!(e.kind, EventKind::WinStreak | EventKind::LossStreak) {
+                    e.streak = Some(3);
+                }
                 tracker::push_event(&mut state, e);
                 state.meta.changed_at = tracker::timestamp(time);
                 self.save(state.clone()).await?;

@@ -97,6 +97,7 @@ pub struct Match {
     pub metadata: Metadata,
     pub players: Vec<Player>,
     pub teams: Vec<Team>,
+    pub kills: Vec<Kill>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -123,6 +124,32 @@ pub struct Stats {
     pub deaths: u32,
     pub assists: u32,
     pub score: u32,
+    pub headshots: u32,
+    pub bodyshots: u32,
+    pub legshots: u32,
+    pub damage: Damage,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[serde(default)]
+pub struct Damage {
+    pub dealt: u32,
+    pub received: u32,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[serde(default)]
+pub struct Kill {
+    pub round: u32,
+    pub time_in_round_in_ms: u64,
+    pub killer: KillPlayer,
+    pub victim: KillPlayer,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[serde(default)]
+pub struct KillPlayer {
+    pub puuid: String,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
